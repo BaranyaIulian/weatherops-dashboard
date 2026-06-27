@@ -1,14 +1,22 @@
 node_modules
 app/node_modules
 coverage
+app/coverage
+
 .git
 .gitignore
+
 README.md
 docs
 k8s
 monitoring
 logging
+jenkins
+
 .env
 app/.env
-npm-debug.log
 
+npm-debug.log
+.DS_Store
+.vscode
+.idea
