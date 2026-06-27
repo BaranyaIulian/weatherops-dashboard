@@ -1,5 +1,6 @@
 const { randomUUID } = require('crypto');
 const logger = require('../utils/logger');
+const { recordHttpRequest } = require('../utils/metrics');
 
 function requestLogger(req, res, next) {
   const startTime = Date.now();

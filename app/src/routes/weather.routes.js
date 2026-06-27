@@ -5,6 +5,10 @@ const {
   addHistoryItem,
   addFailedHistoryItem
 } = require('../services/history.service');
+const {
+  recordWeatherRequest,
+  recordWeatherProviderError
+} = require('../utils/metrics');
 
 const router = express.Router();
 
