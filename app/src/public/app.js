@@ -4,8 +4,6 @@ const weatherResult = document.getElementById('weatherResult');
 const errorBox = document.getElementById('errorBox');
 const historyList = document.getElementById('historyList');
 
-const localHistory = [];
-
 function showError(message) {
   errorBox.textContent = message;
   errorBox.classList.remove('hidden');
@@ -47,24 +45,34 @@ function renderWeather(weather) {
   `;
 }
 
-function updateLocalHistory(weather) {
-  localHistory.unshift({
-    city: weather.city,
-    country: weather.country,
-    source: weather.source,
-    timestamp: new Date(weather.timestamp).toLocaleString()
-  });
+function renderHistory(history) {
+  if (!history.items || history.items.length === 0) {
+    historyList.innerHTML = '<li class="muted">Nu există căutări în istoric.</li>';
+    return;
+  }
 
-  const latest = localHistory.slice(0, 5);
+  historyList.innerHTML = history.items
+    .map((item) => {
+      const statusLabel = item.status === 'success' ? 'success' : 'failed';
+      const temperature =
+        item.temperature !== null && item.temperature !== undefined
+          ? `${item.temperature}°C`
+          : 'N/A';
 
-  historyList.innerHTML = latest
-    .map((item) => `
-      <li>
-        <strong>${item.city}, ${item.country}</strong>
-        <br />
-        <span class="muted">${item.timestamp} | source: ${item.source}</span>
-      </li>
-    `)
+      return `
+        <li>
+          <strong>${item.city}, ${item.country}</strong>
+          <br />
+          <span class="muted">
+            ${temperature} | ${item.description} | ${statusLabel}
+          </span>
+          <br />
+          <span class="muted">
+            source: ${item.source} | ${new Date(item.timestamp).toLocaleString()}
+          </span>
+        </li>
+      `;
+    })
     .join('');
 }
 
@@ -78,6 +86,26 @@ async function fetchWeather(city) {
   }
 
   return data;
+}
+
+async function fetchHistory() {
+  const response = await fetch('/history');
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'History request failed.');
+  }
+
+  return data;
+}
+
+async function refreshHistory() {
+  try {
+    const history = await fetchHistory();
+    renderHistory(history);
+  } catch (error) {
+    historyList.innerHTML = '<li class="muted">Istoricul nu poate fi încărcat.</li>';
+  }
 }
 
 form.addEventListener('submit', async (event) => {
@@ -96,11 +124,14 @@ form.addEventListener('submit', async (event) => {
   try {
     const weather = await fetchWeather(city);
     renderWeather(weather);
-    updateLocalHistory(weather);
+    await refreshHistory();
     cityInput.value = '';
   } catch (error) {
     showError(error.message);
     weatherResult.classList.add('empty');
     weatherResult.innerHTML = '<p>Nu există date meteo disponibile.</p>';
+    await refreshHistory();
   }
 });
+
+refreshHistory();

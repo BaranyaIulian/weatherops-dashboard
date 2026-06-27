@@ -1,5 +1,9 @@
 const express = require('express');
 const { getWeatherByCity } = require('../services/weather.service');
+const {
+  addHistoryItem,
+  addFailedHistoryItem
+} = require('../services/history.service');
 
 const router = express.Router();
 
@@ -10,6 +14,8 @@ router.get('/', async (req, res) => {
   try {
     const weather = await getWeatherByCity(city);
     const durationMs = Date.now() - startTime;
+
+    addHistoryItem(weather, 'success');
 
     console.log(JSON.stringify({
       level: 'info',
@@ -26,6 +32,8 @@ router.get('/', async (req, res) => {
   } catch (error) {
     const durationMs = Date.now() - startTime;
     const statusCode = error.statusCode || 500;
+
+    addFailedHistoryItem(city, error.message);
 
     console.log(JSON.stringify({
       level: 'error',

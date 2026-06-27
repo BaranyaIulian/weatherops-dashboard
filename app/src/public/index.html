@@ -31,7 +31,8 @@
       <div class="panel search-panel">
         <h2>Caută vremea</h2>
         <p class="panel-description">
-          Introdu numele unui oraș. Integrarea cu API-ul meteo va fi adăugată în pasul următor.
+          Introdu numele unui oraș. Aplicația va apela endpoint-ul backend
+          <strong>/weather</strong>, iar rezultatul va fi salvat în istoricul căutărilor.
         </p>
 
         <form id="weatherForm" class="search-form">
@@ -57,8 +58,12 @@
 
       <div class="panel history-panel">
         <h2>Istoric căutări</h2>
+        <p class="panel-description">
+          Istoricul este citit din backend prin endpoint-ul <strong>/history</strong>.
+        </p>
+
         <ul id="historyList" class="history-list">
-          <li class="muted">Istoricul va fi disponibil după implementarea endpoint-ului /history.</li>
+          <li class="muted">Se încarcă istoricul...</li>
         </ul>
       </div>
 
@@ -70,6 +75,7 @@
           <a href="/ready" target="_blank">/ready</a>
           <a href="/version" target="_blank">/version</a>
           <a href="/api" target="_blank">/api</a>
+          <a href="/history" target="_blank">/history</a>
         </div>
 
         <p class="panel-description">
