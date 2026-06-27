@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
+
 
 const config = require('./config/config');
 const healthRoutes = require('./routes/health.routes');
@@ -9,16 +11,18 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(healthRoutes);
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.status(200).json({
     message: 'WeatherOps Dashboard API',
     service: config.appName,
     version: config.appVersion,
     endpoints: [
       '/',
+      '/api',
       '/health',
       '/ready',
       '/version'

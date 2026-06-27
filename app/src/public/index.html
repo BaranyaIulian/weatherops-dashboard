@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WeatherOps Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">DevOps CI/CD Project</p>
+        <h1>WeatherOps Dashboard</h1>
+        <p class="subtitle">
+          Aplicație web pentru afișarea vremii, monitorizare Prometheus,
+          logare centralizată și deployment automat în Kubernetes.
+        </p>
+      </div>
+
+      <div class="status-card">
+        <span class="status-dot"></span>
+        <div>
+          <strong>Application status</strong>
+          <p>Frontend loaded successfully</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <div class="panel search-panel">
+        <h2>Caută vremea</h2>
+        <p class="panel-description">
+          Introdu numele unui oraș. Integrarea cu API-ul meteo va fi adăugată în pasul următor.
+        </p>
+
+        <form id="weatherForm" class="search-form">
+          <input
+            id="cityInput"
+            type="text"
+            placeholder="Ex: Bucharest, London, Paris"
+            autocomplete="off"
+          />
+          <button type="submit">Search</button>
+        </form>
+
+        <div id="errorBox" class="error-box hidden"></div>
+      </div>
+
+      <div class="panel result-panel">
+        <h2>Rezultat meteo</h2>
+
+        <div id="weatherResult" class="weather-result empty">
+          <p>Nu există încă o căutare meteo.</p>
+        </div>
+      </div>
+
+      <div class="panel history-panel">
+        <h2>Istoric căutări</h2>
+        <ul id="historyList" class="history-list">
+          <li class="muted">Istoricul va fi disponibil după implementarea endpoint-ului /history.</li>
+        </ul>
+      </div>
+
+      <div class="panel devops-panel">
+        <h2>DevOps endpoints</h2>
+
+        <div class="endpoint-list">
+          <a href="/health" target="_blank">/health</a>
+          <a href="/ready" target="_blank">/ready</a>
+          <a href="/version" target="_blank">/version</a>
+          <a href="/api" target="_blank">/api</a>
+        </div>
+
+        <p class="panel-description">
+          Aceste endpoint-uri vor fi folosite de Kubernetes, Jenkins și sistemele de monitorizare.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
