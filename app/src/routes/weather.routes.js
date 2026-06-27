@@ -22,6 +22,12 @@ router.get('/', async (req, res) => {
 
     addHistoryItem(weather, 'success');
 
+    recordWeatherRequest({
+      status: 'success',
+      source: weather.source,
+      durationMs
+    });
+
     logger.info('weather_search', {
       request_id: req.requestId,
       city: weather.city,
@@ -36,6 +42,14 @@ router.get('/', async (req, res) => {
     const statusCode = error.statusCode || 500;
 
     addFailedHistoryItem(city, error.message);
+
+    recordWeatherRequest({
+      status: 'failed',
+      source: 'unknown',
+      durationMs
+    });
+
+    recordWeatherProviderError(statusCode);
 
     logger.error('weather_search_failed', {
       request_id: req.requestId,
