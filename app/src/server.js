@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const config = require('./config/config');
 const healthRoutes = require('./routes/health.routes');
+const weatherRoutes = require('./routes/weather.routes');
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(healthRoutes);
+app.use('/weather', weatherRoutes);
+
 
 app.get('/api', (req, res) => {
   res.status(200).json({
@@ -25,7 +28,8 @@ app.get('/api', (req, res) => {
       '/api',
       '/health',
       '/ready',
-      '/version'
+      '/version',
+      '/weather?city=Bucharest'
     ]
   });
 });
