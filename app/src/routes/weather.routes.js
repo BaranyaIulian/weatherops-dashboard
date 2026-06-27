@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('../utils/logger');
 const { getWeatherByCity } = require('../services/weather.service');
 const {
   addHistoryItem,
@@ -17,16 +18,13 @@ router.get('/', async (req, res) => {
 
     addHistoryItem(weather, 'success');
 
-    console.log(JSON.stringify({
-      level: 'info',
-      event: 'weather_search',
-      service: 'weatherops-dashboard',
+    logger.info('weather_search', {
+      request_id: req.requestId,
       city: weather.city,
       status: 'success',
       source: weather.source,
-      duration_ms: durationMs,
-      timestamp: new Date().toISOString()
-    }));
+      duration_ms: durationMs
+    });
 
     res.status(200).json(weather);
   } catch (error) {
@@ -35,21 +33,19 @@ router.get('/', async (req, res) => {
 
     addFailedHistoryItem(city, error.message);
 
-    console.log(JSON.stringify({
-      level: 'error',
-      event: 'weather_search_failed',
-      service: 'weatherops-dashboard',
+    logger.error('weather_search_failed', {
+      request_id: req.requestId,
       city: city || null,
       status: 'failed',
       status_code: statusCode,
       error: error.message,
-      duration_ms: durationMs,
-      timestamp: new Date().toISOString()
-    }));
+      duration_ms: durationMs
+    });
 
     res.status(statusCode).json({
       error: error.message,
       statusCode,
+      requestId: req.requestId,
       timestamp: new Date().toISOString()
     });
   }

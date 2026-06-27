@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('../utils/logger');
 const { getHistory, clearHistory } = require('../services/history.service');
 
 const router = express.Router();
@@ -15,15 +16,13 @@ router.get('/', (req, res) => {
 router.delete('/', (req, res) => {
   clearHistory();
 
-  console.log(JSON.stringify({
-    level: 'info',
-    event: 'history_cleared',
-    service: 'weatherops-dashboard',
-    timestamp: new Date().toISOString()
-  }));
+  logger.info('history_cleared', {
+    request_id: req.requestId
+  });
 
   res.status(200).json({
     message: 'History cleared successfully.',
+    requestId: req.requestId,
     timestamp: new Date().toISOString()
   });
 });
