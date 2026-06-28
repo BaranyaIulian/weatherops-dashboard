@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: weatherops
+  labels:
+    name: weatherops
+    app: weatherops-dashboard
