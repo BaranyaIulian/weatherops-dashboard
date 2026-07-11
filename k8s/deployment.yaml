@@ -25,8 +25,8 @@ spec:
     spec:
       containers:
         - name: weatherops-dashboard
-          image: weatherops-dashboard:local
-          imagePullPolicy: Never
+          image: docker.io/iulianbaranya/weatherops-dashboard:1.0.0
+          imagePullPolicy: Always
 
           ports:
             - name: http
