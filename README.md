@@ -34,3 +34,31 @@ Credential necesar în Jenkins:
 
 ```text
 dockerhub-credentials
+
+## Monitoring cu Prometheus și Grafana
+
+Aplicația expune metrici Prometheus la endpoint-ul:
+
+```text
+/metrics
+
+Pentru instalare Helpm si kube-prometheus-stack
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace
+
+ServiceMonitor pentru aplicație:
+
+kubectl apply -f k8s/servicemonitor.yaml
+
+Acces Prometheus:
+
+kubectl port-forward svc/prometheus-stack-kube-prom-prometheus 9090:9090 -n monitoring
+
+Acces Grafana:
+
+kubectl port-forward svc/prometheus-stack-grafana 3000:80 -n monitoring

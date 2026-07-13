@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: weatherops-servicemonitor
+  namespace: weatherops
+  labels:
+    app: weatherops-dashboard
+    release: prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - weatherops
+  selector:
+    matchLabels:
+      app: weatherops-dashboard
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
