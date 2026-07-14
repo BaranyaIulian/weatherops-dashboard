@@ -35,12 +35,14 @@ function renderWeather(weather) {
 
       <div class="weather-details">
         <span>Feels like: ${weather.feelsLike ?? 'N/A'}°C</span>
-        <span>Humidity: ${weather.humidity}%</span>
-        <span>Wind: ${weather.windSpeed} m/s</span>
-        <span>Pressure: ${weather.pressure} hPa</span>
+        <span>Humidity: ${weather.humidity ?? 'N/A'}%</span>
+        <span>Pressure: ${weather.pressure ?? 'N/A'} hPa</span>
+        <span>Wind: ${weather.windSpeed ?? 'N/A'} m/s</span>
+        <span>Wind direction: ${weather.windDirection ?? 'N/A'}°</span>
+        <span>Precipitation: ${weather.precipitation ?? 'N/A'} mm</span>
         <span>Source: ${weather.source}</span>
-        <span>Time: ${new Date(weather.timestamp).toLocaleTimeString()}</span>
-      </div>
+        <span>Timezone: ${weather.timezone ?? 'N/A'}</span>
+     </div>
     </div>
   `;
 }

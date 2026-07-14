@@ -12,7 +12,7 @@ describe('Weather endpoint', () => {
     expect(response.body.humidity).toBe(45);
     expect(response.body.pressure).toBe(1013);
     expect(response.body.windSpeed).toBe(3.4);
-    expect(response.body.description).toBe('mock clear sky');
+    expect(response.body.description).toBe('cer senin');
     expect(response.body.source).toBe('mock');
     expect(response.body).toHaveProperty('timestamp');
   });

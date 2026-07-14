@@ -26,7 +26,7 @@ describe('Health endpoints', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.service).toBe('weatherops-dashboard');
-    expect(response.body.version).toBe('1.0.0-test');
+    expect(response.body.version).toBe('1.1.0-test');
     expect(response.body.environment).toBe('test');
   });
 });
