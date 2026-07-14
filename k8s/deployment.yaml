@@ -35,9 +35,7 @@ spec:
 
           envFrom:
             - configMapRef:
-                name: weatherops-config
-            - secretRef:
-                name: weatherops-secret
+              name: weatherops-config
 
           readinessProbe:
             httpGet:

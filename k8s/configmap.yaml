@@ -7,12 +7,16 @@ metadata:
     app: weatherops-dashboard
 data:
   APP_NAME: "weatherops-dashboard"
-  APP_VERSION: "1.0.0"
+  APP_VERSION: "1.1.0"
   PORT: "3000"
   NODE_ENV: "production"
   LOG_LEVEL: "info"
 
-  MOCK_MODE: "true"
-  WEATHER_API_URL: "https://api.openweathermap.org/data/2.5/weather"
-  WEATHER_UNITS: "metric"
+  MOCK_MODE: "false"
+
+  OPEN_METEO_GEOCODING_URL: "https://geocoding-api.open-meteo.com/v1/search"
+  OPEN_METEO_FORECAST_URL: "https://api.open-meteo.com/v1/forecast"
+  OPEN_METEO_LANGUAGE: "ro"
+  WEATHER_REQUEST_TIMEOUT_MS: "5000"
+
   CACHE_TTL_SECONDS: "300"

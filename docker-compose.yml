@@ -3,20 +3,27 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+
     image: weatherops-dashboard:compose
     container_name: weatherops-dashboard
+
     ports:
       - "3000:3000"
+
     environment:
       APP_NAME: weatherops-dashboard
-      APP_VERSION: 1.0.0
-      PORT: 3000
-      NODE_ENV: development
+      APP_VERSION: "1.1.0"
+      PORT: "3000"
+      NODE_ENV: production
       LOG_LEVEL: info
 
-      MOCK_MODE: "true"
-      WEATHER_API_URL: https://api.openweathermap.org/data/2.5/weather
-      WEATHER_API_KEY: replace-me
-      WEATHER_UNITS: metric
-      CACHE_TTL_SECONDS: 300
+      MOCK_MODE: "false"
+
+      OPEN_METEO_GEOCODING_URL: https://geocoding-api.open-meteo.com/v1/search
+      OPEN_METEO_FORECAST_URL: https://api.open-meteo.com/v1/forecast
+      OPEN_METEO_LANGUAGE: ro
+      WEATHER_REQUEST_TIMEOUT_MS: "5000"
+
+      CACHE_TTL_SECONDS: "300"
+
     restart: unless-stopped
