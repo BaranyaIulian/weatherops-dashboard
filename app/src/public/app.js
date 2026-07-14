@@ -1,139 +1,382 @@
-const form = document.getElementById('weatherForm');
+const weatherForm = document.getElementById('weatherForm');
 const cityInput = document.getElementById('cityInput');
+const searchButton = document.getElementById('searchButton');
+
+const statusMessage = document.getElementById('statusMessage');
 const weatherResult = document.getElementById('weatherResult');
-const errorBox = document.getElementById('errorBox');
+
+const refreshHistoryButton =
+  document.getElementById('refreshHistoryButton');
+
 const historyList = document.getElementById('historyList');
 
-function showError(message) {
-  errorBox.textContent = message;
-  errorBox.classList.remove('hidden');
+function setStatus(message, type = 'loading') {
+  statusMessage.textContent = message;
+
+  statusMessage.className =
+    `status-message visible ${type}`;
 }
 
-function clearError() {
-  errorBox.textContent = '';
-  errorBox.classList.add('hidden');
+function clearStatus() {
+  statusMessage.textContent = '';
+  statusMessage.className = 'status-message';
 }
 
-function setLoadingState(city) {
-  weatherResult.classList.remove('empty');
-  weatherResult.innerHTML = `
-    <div class="weather-card">
-      <strong>${city}</strong>
-      <p class="muted">Se încarcă datele meteo...</p>
-    </div>
-  `;
-}
-
-function renderWeather(weather) {
-  weatherResult.classList.remove('empty');
-
-  weatherResult.innerHTML = `
-    <div class="weather-card">
-      <strong>${weather.city}, ${weather.country}</strong>
-      <div class="temp">${weather.temperature}°C</div>
-      <p class="muted">${weather.description}</p>
-
-      <div class="weather-details">
-        <span>Feels like: ${weather.feelsLike ?? 'N/A'}°C</span>
-        <span>Humidity: ${weather.humidity ?? 'N/A'}%</span>
-        <span>Pressure: ${weather.pressure ?? 'N/A'} hPa</span>
-        <span>Wind: ${weather.windSpeed ?? 'N/A'} m/s</span>
-        <span>Wind direction: ${weather.windDirection ?? 'N/A'}°</span>
-        <span>Precipitation: ${weather.precipitation ?? 'N/A'} mm</span>
-        <span>Source: ${weather.source}</span>
-        <span>Timezone: ${weather.timezone ?? 'N/A'}</span>
-     </div>
-    </div>
-  `;
-}
-
-function renderHistory(history) {
-  if (!history.items || history.items.length === 0) {
-    historyList.innerHTML = '<li class="muted">Nu există căutări în istoric.</li>';
-    return;
+function formatValue(value, suffix = '') {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ''
+  ) {
+    return `--${suffix}`;
   }
 
-  historyList.innerHTML = history.items
-    .map((item) => {
-      const statusLabel = item.status === 'success' ? 'success' : 'failed';
-      const temperature =
-        item.temperature !== null && item.temperature !== undefined
-          ? `${item.temperature}°C`
-          : 'N/A';
-
-      return `
-        <li>
-          <strong>${item.city}, ${item.country}</strong>
-          <br />
-          <span class="muted">
-            ${temperature} | ${item.description} | ${statusLabel}
-          </span>
-          <br />
-          <span class="muted">
-            source: ${item.source} | ${new Date(item.timestamp).toLocaleString()}
-          </span>
-        </li>
-      `;
-    })
-    .join('');
+  return `${value}${suffix}`;
 }
 
-async function fetchWeather(city) {
-  const response = await fetch(`/weather?city=${encodeURIComponent(city)}`);
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Weather request failed.');
+function formatTemperature(value) {
+  if (value === null || value === undefined) {
+    return '--°';
   }
 
-  return data;
-}
+  const number = Number(value);
 
-async function fetchHistory() {
-  const response = await fetch('/history');
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'History request failed.');
+  if (Number.isNaN(number)) {
+    return '--°';
   }
 
-  return data;
+  return `${Math.round(number)}°`;
 }
 
-async function refreshHistory() {
+function formatDate(value) {
+  if (!value) {
+    return '--';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat('ro-RO', {
+    dateStyle: 'short',
+    timeStyle: 'short'
+  }).format(date);
+}
+
+function getWeatherIcon(weatherCode) {
+  const code = Number(weatherCode);
+
+  if (code === 0) {
+    return '☀️';
+  }
+
+  if ([1, 2].includes(code)) {
+    return '🌤️';
+  }
+
+  if (code === 3) {
+    return '☁️';
+  }
+
+  if ([45, 48].includes(code)) {
+    return '🌫️';
+  }
+
+  if (
+    [
+      51, 53, 55,
+      56, 57,
+      61, 63, 65,
+      66, 67,
+      80, 81, 82
+    ].includes(code)
+  ) {
+    return '🌧️';
+  }
+
+  if (
+    [
+      71, 73, 75,
+      77, 85, 86
+    ].includes(code)
+  ) {
+    return '❄️';
+  }
+
+  if ([95, 96, 99].includes(code)) {
+    return '⛈️';
+  }
+
+  return '🌡️';
+}
+
+function displayWeather(weather) {
+  const city = weather.city || 'Oraș necunoscut';
+
+  const country =
+    weather.countryName ||
+    weather.country ||
+    '';
+
+  const region = weather.region || '';
+
+  const locationParts = [region, country]
+    .filter(Boolean);
+
+  document.getElementById('locationName').textContent =
+    city;
+
+  document.getElementById('locationDetails').textContent =
+    locationParts.length > 0
+      ? locationParts.join(', ')
+      : 'Locație identificată';
+
+  document.getElementById('weatherIcon').textContent =
+    getWeatherIcon(weather.weatherCode);
+
+  document.getElementById('temperature').textContent =
+    formatTemperature(weather.temperature);
+
+  document.getElementById('weatherDescription').textContent =
+    weather.description || 'Condiții meteo indisponibile';
+
+  document.getElementById('feelsLike').textContent =
+    formatValue(weather.feelsLike, '°C');
+
+  document.getElementById('humidity').textContent =
+    formatValue(weather.humidity, '%');
+
+  document.getElementById('windSpeed').textContent =
+    formatValue(weather.windSpeed, ' m/s');
+
+  document.getElementById('windDirection').textContent =
+    formatValue(weather.windDirection, '°');
+
+  document.getElementById('precipitation').textContent =
+    formatValue(weather.precipitation, ' mm');
+
+  document.getElementById('pressure').textContent =
+    formatValue(weather.pressure, ' hPa');
+
+  document.getElementById('observedAt').textContent =
+    formatDate(weather.observedAt || weather.timestamp);
+
+  document.getElementById('weatherSource').textContent =
+    weather.source || 'necunoscută';
+
+  const hasCoordinates =
+    weather.latitude !== null &&
+    weather.latitude !== undefined &&
+    weather.longitude !== null &&
+    weather.longitude !== undefined;
+
+  document.getElementById('coordinates').textContent =
+    hasCoordinates
+      ? `Coordonate: ${weather.latitude}, ${weather.longitude}`
+      : 'Coordonate indisponibile';
+
+  weatherResult.classList.remove('hidden');
+}
+
+async function searchWeather(city) {
+  searchButton.disabled = true;
+  searchButton.textContent = 'Se încarcă...';
+
+  setStatus(
+    `Se caută datele meteo pentru ${city}...`,
+    'loading'
+  );
+
   try {
-    const history = await fetchHistory();
-    renderHistory(history);
+    const response = await fetch(
+      `/weather?city=${encodeURIComponent(city)}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+        data.error ||
+        'Datele meteo nu au putut fi încărcate.'
+      );
+    }
+
+    displayWeather(data);
+
+    setStatus(
+      `Datele pentru ${data.city || city} au fost încărcate.`,
+      'success'
+    );
+
+    await loadHistory();
   } catch (error) {
-    historyList.innerHTML = '<li class="muted">Istoricul nu poate fi încărcat.</li>';
+    weatherResult.classList.add('hidden');
+
+    setStatus(
+      error.message ||
+      'A apărut o eroare la încărcarea datelor.',
+      'error'
+    );
+  } finally {
+    searchButton.disabled = false;
+    searchButton.textContent = 'Caută vremea';
   }
 }
 
-form.addEventListener('submit', async (event) => {
+function extractHistoryItems(data) {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  if (Array.isArray(data.history)) {
+    return data.history;
+  }
+
+  if (Array.isArray(data.results)) {
+    return data.results;
+  }
+
+  return [];
+}
+
+function createHistoryItem(item) {
+  const article = document.createElement('article');
+  article.className = 'history-item';
+
+  const location = document.createElement('div');
+  location.className = 'history-location';
+
+  const cityName = document.createElement('strong');
+  cityName.textContent = item.city || 'Oraș necunoscut';
+
+  const date = document.createElement('span');
+  date.textContent = formatDate(
+    item.observedAt ||
+    item.timestamp ||
+    item.searchedAt
+  );
+
+  location.append(cityName, date);
+
+  const weather = document.createElement('div');
+  weather.className = 'history-weather';
+
+  const temperature = document.createElement('strong');
+  temperature.textContent =
+    formatValue(item.temperature, '°C');
+
+  const description = document.createElement('span');
+  description.textContent =
+    item.description ||
+    item.source ||
+    'Căutare meteo';
+
+  weather.append(temperature, description);
+
+  article.append(location, weather);
+
+  article.addEventListener('click', () => {
+    const city = item.city;
+
+    if (!city) {
+      return;
+    }
+
+    cityInput.value = city;
+    searchWeather(city);
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+
+  return article;
+}
+
+async function loadHistory() {
+  try {
+    const response = await fetch('/history');
+
+    if (!response.ok) {
+      throw new Error('Istoricul nu poate fi încărcat.');
+    }
+
+    const data = await response.json();
+    const items = extractHistoryItems(data);
+
+    historyList.innerHTML = '';
+
+    if (items.length === 0) {
+      const emptyMessage = document.createElement('p');
+
+      emptyMessage.className = 'empty-message';
+      emptyMessage.textContent =
+        'Nu există încă nicio căutare.';
+
+      historyList.appendChild(emptyMessage);
+      return;
+    }
+
+    items
+      .slice()
+      .reverse()
+      .slice(0, 8)
+      .forEach((item) => {
+        historyList.appendChild(
+          createHistoryItem(item)
+        );
+      });
+  } catch (error) {
+    historyList.innerHTML = '';
+
+    const message = document.createElement('p');
+
+    message.className = 'empty-message';
+    message.textContent =
+      'Istoricul nu este disponibil momentan.';
+
+    historyList.appendChild(message);
+  }
+}
+
+weatherForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const city = cityInput.value.trim();
 
-  if (!city) {
-    showError('Te rog introdu un oraș.');
+  if (city.length < 2) {
+    setStatus(
+      'Introdu un oraș cu minimum 2 caractere.',
+      'error'
+    );
+
+    cityInput.focus();
     return;
   }
 
-  clearError();
-  setLoadingState(city);
-
-  try {
-    const weather = await fetchWeather(city);
-    renderWeather(weather);
-    await refreshHistory();
-    cityInput.value = '';
-  } catch (error) {
-    showError(error.message);
-    weatherResult.classList.add('empty');
-    weatherResult.innerHTML = '<p>Nu există date meteo disponibile.</p>';
-    await refreshHistory();
-  }
+  await searchWeather(city);
 });
 
-refreshHistory();
+refreshHistoryButton.addEventListener('click', async () => {
+  refreshHistoryButton.disabled = true;
+  refreshHistoryButton.textContent = 'Se încarcă...';
+
+  await loadHistory();
+
+  refreshHistoryButton.disabled = false;
+  refreshHistoryButton.textContent = 'Actualizează';
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  clearStatus();
+  loadHistory();
+  cityInput.focus();
+});

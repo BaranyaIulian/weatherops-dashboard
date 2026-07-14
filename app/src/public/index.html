@@ -1,111 +1,237 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="WeatherOps Dashboard - aplicație pentru afișarea datelor meteo"
+  >
+
   <title>WeatherOps Dashboard</title>
-  <link rel="stylesheet" href="styles.css" />
+
+  <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body>
-  <main class="page">
-    <section class="hero">
-      <div>
-        <p class="eyebrow">DevOps CI/CD Project</p>
-
-        <h1>WeatherOps Dashboard</h1>
-
-        <p class="subtitle">
-          Aplicație web pentru afișarea vremii, monitorizare Prometheus,
-          logare centralizată și deployment automat în Kubernetes.
-        </p>
-      </div>
-
-      <div class="status-card">
-        <span class="status-dot"></span>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="brand">
+        <div class="brand-icon">☁️</div>
 
         <div>
-          <strong>Application status</strong>
-          <p>Frontend loaded successfully</p>
+          <h1>WeatherOps</h1>
+          <p>Dashboard meteo</p>
         </div>
+      </div>
+
+      <div class="environment-badge">
+        Open-Meteo
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <section class="intro-section">
+      <p class="section-label">WEATHER DASHBOARD</p>
+
+      <h2>Verifică vremea din orașul tău</h2>
+
+      <p class="intro-description">
+        Introdu numele unui oraș pentru a vedea temperatura,
+        umiditatea, vântul și condițiile meteo actuale.
+      </p>
+    </section>
+
+    <section class="search-card">
+      <form id="weatherForm" class="search-form">
+        <div class="input-group">
+          <label for="cityInput">Oraș</label>
+
+          <input
+            id="cityInput"
+            name="city"
+            type="text"
+            placeholder="Exemplu: București"
+            autocomplete="off"
+            maxlength="100"
+            required
+          >
+        </div>
+
+        <button
+          id="searchButton"
+          class="primary-button"
+          type="submit"
+        >
+          Caută vremea
+        </button>
+      </form>
+
+      <div
+        id="statusMessage"
+        class="status-message"
+        role="status"
+        aria-live="polite"
+      ></div>
+    </section>
+
+    <section
+      id="weatherResult"
+      class="weather-card hidden"
+      aria-live="polite"
+    >
+      <div class="weather-card-header">
+        <div>
+          <p class="section-label">CONDIȚII ACTUALE</p>
+
+          <h2 id="locationName">Oraș</h2>
+
+          <p id="locationDetails" class="location-details">
+            Regiune, țară
+          </p>
+        </div>
+
+        <div
+          id="weatherIcon"
+          class="weather-icon"
+          aria-hidden="true"
+        >
+          ☀️
+        </div>
+      </div>
+
+      <div class="temperature-section">
+        <div>
+          <span id="temperature" class="temperature-value">
+            --°
+          </span>
+
+          <p id="weatherDescription" class="weather-description">
+            Condiții meteo
+          </p>
+        </div>
+
+        <div class="feels-like">
+          <span>Se simte ca</span>
+          <strong id="feelsLike">--°C</strong>
+        </div>
+      </div>
+
+      <div class="weather-details-grid">
+        <article class="detail-card">
+          <span class="detail-icon">💧</span>
+
+          <div>
+            <p>Umiditate</p>
+            <strong id="humidity">--%</strong>
+          </div>
+        </article>
+
+        <article class="detail-card">
+          <span class="detail-icon">🌬️</span>
+
+          <div>
+            <p>Vânt</p>
+            <strong id="windSpeed">-- m/s</strong>
+          </div>
+        </article>
+
+        <article class="detail-card">
+          <span class="detail-icon">🧭</span>
+
+          <div>
+            <p>Direcția vântului</p>
+            <strong id="windDirection">--°</strong>
+          </div>
+        </article>
+
+        <article class="detail-card">
+          <span class="detail-icon">🌧️</span>
+
+          <div>
+            <p>Precipitații</p>
+            <strong id="precipitation">-- mm</strong>
+          </div>
+        </article>
+
+        <article class="detail-card">
+          <span class="detail-icon">📊</span>
+
+          <div>
+            <p>Presiune</p>
+            <strong id="pressure">-- hPa</strong>
+          </div>
+        </article>
+
+        <article class="detail-card">
+          <span class="detail-icon">🕒</span>
+
+          <div>
+            <p>Actualizat</p>
+            <strong id="observedAt">--</strong>
+          </div>
+        </article>
+      </div>
+
+      <div class="weather-footer">
+        <span>
+          Sursă:
+          <strong id="weatherSource">--</strong>
+        </span>
+
+        <span id="coordinates">--</span>
       </div>
     </section>
 
-    <section class="dashboard-grid">
-      <div class="panel search-panel">
-        <h2>Caută vremea</h2>
-
-        <p class="panel-description">
-          Introdu numele unui oraș. Aplicația va apela endpoint-ul backend
-          <strong>/weather</strong>, iar rezultatul va fi salvat în istoricul
-          căutărilor.
-        </p>
-
-        <form id="weatherForm" class="search-form">
-          <input
-            id="cityInput"
-            type="text"
-            placeholder="Ex: Bucharest, London, Paris"
-            autocomplete="off"
-          />
-
-          <button type="submit">Search</button>
-        </form>
-
-        <div id="errorBox" class="error-box hidden"></div>
-      </div>
-
-      <div class="panel result-panel">
-        <h2>Rezultat meteo</h2>
-
-        <div id="weatherResult" class="weather-result empty">
-          <p>Nu există încă o căutare meteo.</p>
+    <section class="history-card">
+      <div class="section-header">
+        <div>
+          <p class="section-label">ISTORIC</p>
+          <h2>Căutări recente</h2>
         </div>
 
-        <p class="panel-description">
-          <a
-            href="https://open-meteo.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Weather data by Open-Meteo.com
-          </a>
-        </p>
+        <button
+          id="refreshHistoryButton"
+          class="secondary-button"
+          type="button"
+        >
+          Actualizează
+        </button>
       </div>
 
-      <div class="panel history-panel">
-        <h2>Istoric căutări</h2>
-
-        <p class="panel-description">
-          Istoricul este citit din backend prin endpoint-ul
-          <strong>/history</strong>.
-        </p>
-
-        <ul id="historyList" class="history-list">
-          <li class="muted">Se încarcă istoricul...</li>
-        </ul>
-      </div>
-
-      <div class="panel devops-panel">
-        <h2>DevOps endpoints</h2>
-
-        <div class="endpoint-list">
-          <a href="/health" target="_blank" rel="noopener noreferrer">/health</a>
-          <a href="/ready" target="_blank" rel="noopener noreferrer">/ready</a>
-          <a href="/version" target="_blank" rel="noopener noreferrer">/version</a>
-          <a href="/api" target="_blank" rel="noopener noreferrer">/api</a>
-          <a href="/history" target="_blank" rel="noopener noreferrer">/history</a>
-          <a href="/metrics" target="_blank" rel="noopener noreferrer">/metrics</a>
-        </div>
-
-        <p class="panel-description">
-          Aceste endpoint-uri vor fi folosite de Kubernetes, Jenkins și
-          sistemele de monitorizare.
+      <div id="historyList" class="history-list">
+        <p class="empty-message">
+          Nu există încă nicio căutare.
         </p>
       </div>
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <p>
+        WeatherOps Dashboard · Proiect DevOps
+      </p>
+
+      <p>
+        Date meteo furnizate de
+        <a
+          href="https://open-meteo.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open-Meteo
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
 </body>
 </html>
