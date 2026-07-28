@@ -5,9 +5,11 @@ metadata:
   namespace: weatherops
   labels:
     app: weatherops-dashboard
+
 spec:
   replicas: 2
   revisionHistoryLimit: 5
+
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -22,6 +24,7 @@ spec:
     metadata:
       labels:
         app: weatherops-dashboard
+
     spec:
       containers:
         - name: weatherops-dashboard
@@ -35,7 +38,7 @@ spec:
 
           envFrom:
             - configMapRef:
-              name: weatherops-config
+                name: weatherops-config
 
           readinessProbe:
             httpGet:
