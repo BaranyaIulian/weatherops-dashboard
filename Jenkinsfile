@@ -341,10 +341,8 @@ pipeline {
                             echo "k8s/hpa.yaml not found. Skipping HPA."
                         fi
 
-                        /*
-                         * ServiceMonitor este aplicat numai dacă există
-                         * manifestul și CRD-ul Prometheus Operator.
-                         */
+                        # ServiceMonitor este aplicat numai dacă există
+                        # manifestul și CRD-ul Prometheus Operator.
                         if [ -f k8s/servicemonitor.yaml ]; then
                             if kubectl api-resources \
                                 --api-group=monitoring.coreos.com \
@@ -356,6 +354,8 @@ pipeline {
                             else
                                 echo "ServiceMonitor CRD is unavailable. Skipping it."
                             fi
+                        else
+                            echo "k8s/servicemonitor.yaml not found. Skipping it."
                         fi
                     '''
                 }
