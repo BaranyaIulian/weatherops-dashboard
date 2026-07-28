@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: weatherops-monitor
+  namespace: weatherops
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: weatherops
+  namespaceSelector:
+    matchNames:
+      - weatherops
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
